@@ -13,7 +13,7 @@ This MCP Server gives the tools to Claude to classify Bowman Prospects Baseball 
 ## Fine tuned CLIP Model
 The model is fine tuned using ~12,000 bowman labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
 
-It currently holds a 90.84% accuracy rate in identify the rarity of bowman prospects cards.
+It currently holds a 90.84% accuracy rate in identifying the rarity of bowman prospects cards.
 
 ## Sample Workflow
 
