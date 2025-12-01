@@ -1,30 +1,44 @@
 # Bowman Prospects Classification MCP Server
 
-This Application Allows Users to Give Tools to Claude to Fully Classify their Bowman Prospects Card (Chrome or Paper) to determine wheather it has current/future value.
+This MCP Server gives the tools to Claude to classify Bowman Prospects Baseball cards (Chrome or Paper) to determine their current and future value. Ths is done by creating tools to analyze baseball cards through image recognition (contrastive loss), player statistics, and market pricing data.
 
-## Available Tools:
-- Full Classification of the baseball card from Image using a Fine-Tuned [Clip Model](https://openai.com/index/clip/) (~12,000 datasets) and easyocr to identify Rarity (chrome, Blue, atomic, etc.), Player on the card, Grading and other General Information.
-- Provides Full Career Statistics (Major League and Minor League) including advanced stats such as (WAR, DRS, OPS+, etc.) for full potential and production analysis.
-- Provides full pricing data of the card, Volume Sold, for the specific grading.
+## Available Tools
+
+- **Card Classification** — Identifies card details from images using a fine-tuned [CLIP model](https://openai.com/index/clip/) (~12,000 training samples) combined with EasyOCR. Extracts rarity (Chrome, Blue, Atomic, etc.), player information, grading status, and other key attributes.
+
+- **Player Statistics** — Retrieves comprehensive career statistics across Major League and Minor League levels, including advanced metrics (WAR, DRS, OPS+, etc.) for evaluating player potential and production.
+
+- **Pricing Data** — Provides current market prices and sales volume for the specific card and grade.
+
+## Fine tuned CLIP Model
+The model is fine tuned using ~12,000 bowman labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
+
+It currently holds a 90.84% accuracy rate in identify the rarity of bowman prospects cards.
 
 ## Sample Workflow
 
 ### Input
-Consider the Input of paths to these 2 pictures. (As of Now (Nov 20, 2025), Local MCP doesn't support directly attaching images into Claude Desktop)
+
+As an Example, we connect the MCP server to Claude and give the image paths to the following image. (Note: As of November 20, 2025, local MCP does not support attaching images directly to Claude Desktop.)
+
 <p float="left">
   <img src="https://github.com/user-attachments/assets/399ddadd-20ff-4df5-bf2b-ddc2ac23d4fc" width="200" />
   <img src="https://github.com/user-attachments/assets/a82a5db7-1fce-4616-ab6a-aa0bdfce313b" width="200" />
 </p>
 
-
 ### Output
-<img width="1512" height="619" alt="Screenshot 2025-11-20 at 12 25 45 AM" src="https://github.com/user-attachments/assets/228a9f69-649d-4324-b228-a9fa04a1d3b1" />
-<img width="1511" height="712" alt="Screenshot 2025-11-20 at 12 26 10 AM" src="https://github.com/user-attachments/assets/7ca56fe9-6c6d-437f-a6cd-42c16a32f990" />
-<img width="1512" height="574" alt="Screenshot 2025-11-20 at 12 26 24 AM" src="https://github.com/user-attachments/assets/733533c8-1f79-47d4-b921-30f1be15f8e9" />
 
-### Tool Response (Data Given to Claude)
-#### Predict
-```
+<img width="1512" height="619" alt="Screenshot 2025-11-20 at 12 25 45 AM" src="https://github.com/user-attachments/assets/228a9f69-649d-4324-b228-a9fa04a1d3b1" />
+<img width="1511" height="712" alt="Screenshot 2025-11-20 at 12 26 10 AM" src="https://github.com/user-attachments/assets/7ca56fe9-6c6d-437f-a6cd-42c16a32f990" />
+<img width="1512" height="574" alt="Screenshot 2025-11-20 at 12 26 24 AM" src="https://github.com/user-attachments/assets/733533c8-1f79-47d4-b921-30f1be15f8e9" />
+
+### Tool Responses
+
+Below is the raw data returned to Claude by each tool.
+
+#### Predict (Card Classification)
+
+```json
 {
   "player_profile": {
     "name": "HYUN-IL CHOI",
@@ -32,9 +46,9 @@ Consider the Input of paths to these 2 pictures. (As of Now (Nov 20, 2025), Loca
     "team": "LOS ANGELES DODGERS",
     "date_of_birth": "05-27-2000",
     "location_of_birth": "SEOUL, SOUTH KOREA",
-    "resume": "No. 13 Dodgers prospect (Baseball America). Averaged 9.8 SOs/9 IP in 2019 Arizona League, Forged SO/BB ratio of 6.5-to-1 ...Led team in wins (tied), innings and whiffs.",
-    "skills": "Varies speeds and locations cunningly to keep hitters guessing: Loose arm action. Low-90s fastball ...Late-breaking hook, . . Promising change-up. Confident athlete.",
-    "up_close": "Top contender to go No. 1 overall in Korea Baseball Organization draft coming out of high school. Opted to sign with Dodgers instead"
+    "resume": "No. 13 Dodgers prospect (Baseball America). Averaged 9.8 SOs/9 IP in 2019 Arizona League. Forged SO/BB ratio of 6.5-to-1. Led team in wins (tied), innings, and strikeouts.",
+    "skills": "Varies speeds and locations cunningly to keep hitters guessing. Loose arm action. Low-90s fastball. Late-breaking hook. Promising change-up. Confident athlete.",
+    "up_close": "Top contender to go No. 1 overall in the Korea Baseball Organization draft coming out of high school. Opted to sign with the Dodgers instead."
   },
   "card_info": {
     "card_code": "BCP-130",
@@ -45,8 +59,10 @@ Consider the Input of paths to these 2 pictures. (As of Now (Nov 20, 2025), Loca
   }
 }
 ```
-#### Prospect
-```
+
+#### Prospect (Player Statistics)
+
+```json
 {
   "Major League Statistics": null,
   "Minor League Statistics": {
@@ -227,8 +243,10 @@ Consider the Input of paths to these 2 pictures. (As of Now (Nov 20, 2025), Loca
   }
 }
 ```
-### Baseball Card
-```
+
+#### Baseball Card (Pricing Data)
+
+```json
 {
   "card_price": {
     "ungraded": "$2.50",
@@ -260,4 +278,5 @@ Consider the Input of paths to these 2 pictures. (As of Now (Nov 20, 2025), Loca
   }
 }
 ```
+
 
