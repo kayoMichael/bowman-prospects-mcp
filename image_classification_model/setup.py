@@ -124,7 +124,7 @@ def main():
     output = []
     for category in BOWMAN_CHROME_PARALLELS_DICT:
         for card_category in BOWMAN_CHROME_PARALLELS_DICT[category]:
-            query = f"BCP {" ".join(card_category)}".strip().replace(" ", "+")
+            query = f"BCP {' '.join(card_category)}".strip().replace(" ", "+")
             for page in range(1, 4):
                 current = scrape_ebay(info, query, page)
                 if len(current) != 0:

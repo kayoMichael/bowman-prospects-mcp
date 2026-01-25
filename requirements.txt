@@ -1,0 +1,12 @@
+pdfplumber==0.11.7
+requests_cache==1.2.1
+lxml==6.0.1
+pandas==2.3.2
+datasets==4.1.1
+torch==2.2.2
+transformers==4.57.0
+openai==2.15.0
+dotenv==0.9.9
+easyocr==1.7.2
+pydantic==2.12.5
+numpy==1.26.4

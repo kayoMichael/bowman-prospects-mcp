@@ -23,14 +23,16 @@ def predict_service(front, back):
     front_text = [t for (_b, t, _c) in front_results]
     back_text = [t for (_b, t, _c) in back_results]
 
+    front_info = "\n".join(front_text)
+    back_info = "\n".join(back_text)
     user_msg: ChatCompletionUserMessageParam = {
         "role": "user",
         "content": f"""
             {card_extract_instruction}
             Front_card_info:
-            {"\n".join(front_text)}
+            {front_info}
             Back_card_info:
-            {"\n".join(back_text)}
+            {back_info}
             """,
     }
     card_info = deepseek.invoke(ocr_system_msg, user_msg)

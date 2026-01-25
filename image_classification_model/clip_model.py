@@ -1,4 +1,5 @@
 import os
+import argparse
 import pandas as pd
 import torch
 import json
@@ -11,6 +12,7 @@ from transformers import (
     TrainingArguments,
 )
 from pathlib import Path
+from image_classification_model.setup import main as fetch
 
 if torch.backends.mps.is_available():
     print("Using Apple GPU")
@@ -23,11 +25,8 @@ else:
     device = torch.device("cpu")
 
 ROOT_DIR = Path(__file__).resolve().parent
-
-MODEL_NAME = ROOT_DIR / "models" / "clip-card-model-v1"
-NEW_MODEL = ROOT_DIR / "models" / "clip-card-model-v1"
-MODEL_NAME = str(MODEL_NAME.resolve())
-NEW_MODEL = str(NEW_MODEL.resolve())
+EXISTING_MODEL = "hazelbestt/bowman_prospects_classifier"
+NEW_MODEL = str((ROOT_DIR / "models" / "clip-card-model-latest").resolve())
 
 class LossTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
@@ -39,14 +38,24 @@ class LossTrainer(Trainer):
         return (loss, outputs) if return_outputs else loss
 
 class ClipModel:
-    def __init__(self, base_model = MODEL_NAME):
-        self.model = CLIPModel.from_pretrained(base_model)
-        self.model.to(device)
+    def __init__(self, base_model = EXISTING_MODEL, custom_dataset = False, fetch_data = False):
+        self.base_model = base_model
+        self.model = CLIPModel.from_pretrained(base_model).to(device)
         self.processor = CLIPProcessor.from_pretrained(base_model, use_fast=True)
         self.root = "data_set"
+        self.custom_dataset = custom_dataset
         self.dataset = None
+        self.fetch_data = fetch_data
 
     def _data_set_setup(self):
+        if not self.custom_dataset:
+            self.dataset = load_dataset("hazelbestt/bowman_prospects_supervised_images")["train"]
+            return
+
+        if self.fetch_data:
+            print("Fetching ~13,000 Baseball Image Data. This will take around ~3-4 hours due to strict rate limits.")
+            fetch()
+
         data = []
         for path, _, files in os.walk(self.root):
             for f in files:
@@ -98,9 +107,11 @@ class ClipModel:
 
         return labels
 
-    def train_model(self, learning_rate, epoch, batch_size, accumulation_steps):
+    def train_model(self, learning_rate, epoch, batch_size, accumulation_steps, reset_to_base=True):
         self._data_set_setup()
-
+        if reset_to_base:
+            self.model = CLIPModel.from_pretrained(self.base_model).to(device)
+            self.processor = CLIPProcessor.from_pretrained(self.base_model, use_fast=True)
         split = self.dataset.train_test_split(test_size=0.2, seed=42)
         train_ds = split["train"]
         val_ds = split["test"]
@@ -253,3 +264,24 @@ class ClipModel:
         best_idx = sims.argmax().item()
 
         return labels[best_idx]
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lr", type=float, default=5e-6)
+    parser.add_argument("--epochs", type=int, default=15)
+    parser.add_argument("--batch-size", type=int, default=2)
+    parser.add_argument("--accumulation-steps", type=int, default=4)
+    parser.add_argument("--custom-dataset", action="store_true")
+    parser.add_argument("--reset-to-base", action="store_true")
+    parser.add_argument("--fetch-data", action="store_true")
+
+    args = parser.parse_args()
+
+    model = ClipModel(custom_dataset=args.custom_dataset, fetch_data=args.fetch_data)
+    model.train_model(
+        learning_rate=args.lr,
+        epoch=args.epochs,
+        batch_size=args.batch_size,
+        accumulation_steps=args.accumulation_steps,
+        reset_to_base=args.reset_to_base
+    )
