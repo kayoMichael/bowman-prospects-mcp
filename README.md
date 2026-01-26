@@ -10,10 +10,81 @@ This MCP Server gives the tools to Claude to classify Bowman Prospects Baseball 
 
 - **Pricing Data** — Provides current market prices and sales volume for the specific card and grade.
 
-## Fine tuned CLIP Model
-The model is fine tuned using ~12,000 bowman labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
+## Fine-tuned CLIP Model
+The model is fine-tuned using ~12,000 bowman labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
 
 It currently holds a 90.84% accuracy rate in identifying the rarity of bowman prospects cards.
+
+## Data
+
+### Source
+The Relevant Data is fetched from multiple websites:
+- Card Pricing: https://www.sportscardspro.com/category/baseball-cards
+- Player Statistics: https://www.baseball-reference.com/register/index.fcgi
+- Player Global IDs: https://raw.githubusercontent.com/chadwickbureau/register/master/
+- Baseball Card Images: https://www.ebay.ca/
+
+### Parse
+The Raw HTML content is then parsed using [DeepSeek API](https://www.deepseek.com/) for reliability against page structure changes.
+You can see the relevant LLM Prompt here: [prompt](https://github.com/kayoMichael/bowman-prospects-mcp/blob/main/context/const/prompt.py)
+
+## Running the MCP
+1. Install [Claude Desktop](https://code.claude.com/docs/en/desktop)
+2. Clone the Repository
+3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+4. Fill in the env file
+5. Run via Make
+```bash
+make run-mcp
+```
+6. Follow this [Guide](https://modelcontextprotocol.io/docs/develop/connect-local-servers) to connect the MCP to Claude Desktop
+
+
+## Training the Model
+The MCP comes pre-built with a Model and the Dataset required to classify images with relative accuracy. But users can train on top of the current model.
+
+### Docker (CPU only)
+```bash
+make train-cpu
+```
+
+### Using GPU
+```bash
+make train-mps
+```
+
+### Configurable Flags for Training
+- LR: Learning rate (default: 5e-6)
+- EPOCHS: Number of epochs (default: 15)
+- BATCH_SIZE: Batch size (default: 2)
+- ACC_STEPS: Gradient accumulation steps (default: 4)
+- CUSTOM: Use custom local dataset instead of HuggingFace dataset (0 or 1, default: 0)
+- FETCH: Fetch dataset images before training (0 or 1, default: 0)
+- RESET: Reset model weights to the base [checkpoint](https://huggingface.co/hazelbestt/bowman_prospects_classifier) before training (0 or 1, default: 0)
+
+#### Example
+```
+make train-mps LR=1e-5 EPOCHS=5 BATCH_SIZE=4 ACC_STEPS=2 CUSTOM=1 FETCH=1 RESET=1
+```
+
+### Custom Datasets
+To train the model with a custom dataset, create a data_set directory in the root of the project. Then store images with directories as labels
+
+e.g.
+```
+data_set/
+└── chrome/
+    └── aqua/
+        └── non_auto/
+            ├── 2018 Bowman Chrome Prospects Aqua Refractor _125 Adam Haseley _BCP94.jpg
+            ├── 2018 Bowman Chrome Prospects Refractors Aqua Shimmer Adam Haseley Phillies _125.jpg
+            └── 2018 Bowman _BCP80 Matt Hall Chrome Prospects Aqua Refractor __125.jpg
+```
+
+The file name of the images do not matter.
 
 ## Sample Workflow
 
@@ -278,5 +349,3 @@ Below is the raw data returned to Claude by each tool.
   }
 }
 ```
-
-
