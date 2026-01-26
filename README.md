@@ -1,6 +1,6 @@
 # Bowman Prospects Classification MCP Server
 
-This MCP Server gives the tools to Claude to classify Bowman Prospects Baseball cards (Chrome or Paper) to determine their current and future value. Ths is done by creating tools to analyze baseball cards through image recognition (contrastive loss), player statistics, and market pricing data.
+This MCP Server gives the tools to classify Bowman Prospects Baseball cards (Chrome or Paper) to determine their current and future value. It allows Claude to access 3 tools to analyze baseball cards through image recognition (contrastive loss), player statistics, and market pricing data.
 
 ## Available Tools
 
@@ -11,7 +11,7 @@ This MCP Server gives the tools to Claude to classify Bowman Prospects Baseball 
 - **Pricing Data** — Provides current market prices and sales volume for the specific card and grade.
 
 ## Fine-tuned CLIP Model
-The model is fine-tuned using ~12,000 bowman labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
+The model is fine-tuned using ~12,000 labeled bowman prospects image scrapped and categorized from Ebay. The model can be downloaded from [here](https://huggingface.co/hazelbestt/bowman_prospects_classifier)
 
 It currently holds a 90.84% accuracy rate in identifying the rarity of bowman prospects cards.
 
@@ -25,7 +25,7 @@ The Relevant Data is fetched from multiple websites:
 - Baseball Card Images: https://www.ebay.ca/
 
 ### Parse
-The Raw HTML content is then parsed using [DeepSeek API](https://www.deepseek.com/) for reliability against page structure changes.
+The raw HTML content is then parsed using [DeepSeek API](https://www.deepseek.com/) for reliability against page structure changes.
 You can see the relevant LLM Prompt here: [prompt](https://github.com/kayoMichael/bowman-prospects-mcp/blob/main/context/const/prompt.py)
 
 ## Running the MCP
