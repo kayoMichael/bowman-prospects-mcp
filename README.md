@@ -24,6 +24,9 @@ The Relevant Data is fetched from multiple websites:
 - Player Global IDs: https://raw.githubusercontent.com/chadwickbureau/register/master/
 - Baseball Card Images: https://www.ebay.ca/
 
+### Dataset
+The library fetches the complete dataset for training from here: https://huggingface.co/datasets/hazelbestt/bowman_prospects_supervised_images
+
 ### Parse
 The raw HTML content is then parsed using [DeepSeek API](https://www.deepseek.com/) for reliability against page structure changes.
 You can see the relevant LLM Prompt here: [prompt](https://github.com/kayoMichael/bowman-prospects-mcp/blob/main/context/const/prompt.py)
